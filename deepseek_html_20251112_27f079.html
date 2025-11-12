@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公益盲盒·城市任务生成器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { max-width: 500px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center; }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .blind-box { padding: 30px 20px; text-align: center; }
+        .box { width: 200px; height: 200px; margin: 0 auto 30px; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .box:hover { transform: scale(1.05); }
+        .box:before { content: "?"; font-size: 60px; color: white; font-weight: bold; }
+        .box.open { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+        .box.open:before { content: ""; }
+        .task-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-top: 20px; display: none; animation: fadeIn 0.5s ease; }
+        .task-card.show { display: block; }
+        .task-title { color: #667eea; font-size: 18px; margin-bottom: 15px; font-weight: bold; }
+        .generate-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>公益盲盒·城市任务</h1>
+            <p>开启你的每日公益行动，让城市更温暖</p>
+        </div>
+        <div class="blind-box">
+            <div class="box" id="blindBox"></div>
+            <button class="generate-btn" id="generateBtn">生成公益任务</button>
+            <div class="task-card" id="taskCard">
+                <div class="task-title" id="taskTitle">今日公益任务</div>
+                <div class="task-content" id="taskContent"></div>
+                <div class="task-tip">完成后记得拍照打卡，分享温暖！</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tasks = [
+            { title: "街角温暖", content: "为一位户外工作者送上一瓶水或一句真诚的感谢。" },
+            { title: "记忆收藏", content: "找一位陌生人聊聊天，聆听他们的一个故事。" },
+            { title: "随手净化", content: "在你经过的路上捡拾5件垃圾，并进行分类投放。" },
+            { title: "共享微笑", content: "今天对至少5位陌生人微笑并问候，传递友善的能量。" },
+            { title: "扶车行动", content: "将路边倒下的共享单车扶起并整齐摆放。" }
+        ];
+        
+        const blindBox = document.getElementById('blindBox');
+        const generateBtn = document.getElementById('generateBtn');
+        const taskCard = document.getElementById('taskCard');
+        const taskTitle = document.getElementById('taskTitle');
+        const taskContent = document.getElementById('taskContent');
+        
+        function generateTask() {
+            const randomIndex = Math.floor(Math.random() * tasks.length);
+            const task = tasks[randomIndex];
+            taskTitle.textContent = task.title;
+            taskContent.textContent = task.content;
+            taskCard.classList.add('show');
+            blindBox.classList.add('open');
+        }
+        
+        blindBox.addEventListener('click', generateTask);
+        generateBtn.addEventListener('click', generateTask);
+    </script>
+</body>
+</html>
