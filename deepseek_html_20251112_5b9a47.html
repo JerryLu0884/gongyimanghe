@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公益盲盒·城市任务生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .blind-box {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .box {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .box:hover {
+            transform: scale(1.05);
+        }
+        
+        .box:before {
+            content: "?";
+            font-size: 60px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .box.open {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        
+        .box.open:before {
+            content: "";
+        }
+        
+        .task-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .task-card.show {
+            display: block;
+        }
+        
+        .task-title {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .task-content {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .task-tip {
+            color: #888;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 20px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .history {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .history h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 10px;
+            border-left: 3px solid #667eea;
+            background: #f8f9ff;
+            margin-bottom: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .instructions {
+            padding: 15px 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>公益盲盒·城市任务</h1>
+            <p>开启你的每日公益行动，让城市更温暖</p>
+        </div>
+        
+        <div class="instructions">
+            <p>点击下方盲盒或"生成任务"按钮，随机获取一个公益任务，完成后记得拍照打卡哦！</p>
+        </div>
+        
+        <div class="blind-box">
+            <div class="box" id="blindBox"></div>
+            
+            <button class="generate-btn" id="generateBtn">生成公益任务</button>
+            
+            <div class="task-card" id="taskCard">
+                <div class="task-title" id="taskTitle">今日公益任务</div>
+                <div class="task-content" id="taskContent"></div>
+                <div class="task-tip">完成后记得拍照打卡，分享温暖！</div>
+            </div>
+        </div>
+        
+        <div class="history">
+            <h3>任务历史</h3>
+            <div class="history-list" id="historyList">
+                <!-- 历史任务将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 公益任务库
+        const tasks = [
+            {
+                title: "街角温暖",
+                content: "为一位户外工作者（如清洁工、快递员、交警）送上一瓶水或一句真诚的感谢。"
+            },
+            {
+                title: "记忆收藏",
+                content: "找一位陌生人（如公园里的老人、咖啡馆的店员）聊聊天，聆听他们的一个故事。"
+            },
+            {
+                title: "随手净化",
+                content: "在你经过的路上捡拾5件垃圾，并进行分类投放。"
+            },
+            {
+                title: "书籍漂流",
+                content: "带一本你喜欢的书放在公共长椅上，附上一张纸条'免费阅读，阅后请继续传递'。"
+            },
+            {
+                title: "暖心便签",
+                content: "写3张鼓励的便签，贴在公共场所（如图书馆、食堂）的合适位置，给陌生人带来惊喜。"
+            },
+            {
+                title: "共享微笑",
+                content: "今天对至少5位陌生人微笑并问候，传递友善的能量。"
+            },
+            {
+                title: "扶车行动",
+                content: "将路边倒下的共享单车扶起并整齐摆放，方便他人使用。"
+            },
+            {
+                title: "邻里互助",
+                content: "主动询问一位邻居是否需要帮忙，如取快递、倒垃圾等小事。"
+            },
+            {
+                title: "食物分享",
+                content: "多准备一份食物或水果，分享给有需要的人（如保安、环卫工人）。"
+            },
+            {
+                title: "感恩行动",
+                content: "给你常去的一家小店（如早餐店、便利店）写一张感谢卡，感谢他们的服务。"
+            },
+            {
+                title: "指路天使",
+                content: "主动帮助一位看起来迷路的陌生人指路或带路。"
+            },
+            {
+                title: "爱心让座",
+                content: "在公共交通上主动为有需要的人让座，并附上一个微笑。"
+            },
+            {
+                title: "社区美化",
+                content: "为你所在的社区或学校清理一小片公共区域，如擦拭公共设施。"
+            },
+            {
+                title: "正能量传播",
+                content: "在社交媒体上分享一件今天遇到或自己做的好人好事。"
+            },
+            {
+                title: "环保倡导",
+                content: "减少使用一次塑料制品，并向一位朋友解释环保的重要性。"
+            }
+        ];
+        
+        const blindBox = document.getElementById('blindBox');
+        const generateBtn = document.getElementById('generateBtn');
+        const taskCard = document.getElementById('taskCard');
+        const taskTitle = document.getElementById('taskTitle');
+        const taskContent = document.getElementById('taskContent');
+        const historyList = document.getElementById('historyList');
+        
+        let taskHistory = [];
+        
+        // 生成随机任务
+        function generateTask() {
+            // 随机选择一个任务
+            const randomIndex = Math.floor(Math.random() * tasks.length);
+            const task = tasks[randomIndex];
+            
+            // 更新任务卡片内容
+            taskTitle.textContent = task.title;
+            taskContent.textContent = task.content;
+            
+            // 显示任务卡片
+            taskCard.classList.add('show');
+            
+            // 添加开箱动画
+            blindBox.classList.add('open');
+            blindBox.style.animation = 'none';
+            setTimeout(() => {
+                blindBox.style.animation = 'fadeIn 0.5s ease';
+            }, 10);
+            
+            // 添加到历史记录
+            addToHistory(task);
+        }
+        
+        // 添加到历史记录
+        function addToHistory(task) {
+            // 添加到数组开头
+            taskHistory.unshift({
+                title: task.title,
+                content: task.content,
+                time: new Date().toLocaleTimeString()
+            });
+            
+            // 只保留最近5条记录
+            if (taskHistory.length > 5) {
+                taskHistory.pop();
+            }
+            
+            // 更新历史记录显示
+            updateHistoryDisplay();
+        }
+        
+        // 更新历史记录显示
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            
+            if (taskHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #888;">暂无历史任务</p>';
+                return;
+            }
+            
+            taskHistory.forEach(task => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <strong>${task.title}</strong> - <small>${task.time}</small>
+                    <div style="font-size: 13px; margin-top: 5px;">${task.content}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // 事件监听
+        blindBox.addEventListener('click', generateTask);
+        generateBtn.addEventListener('click', generateTask);
+        
+        // 初始化
+        updateHistoryDisplay();
+    </script>
+</body>
+</html>
